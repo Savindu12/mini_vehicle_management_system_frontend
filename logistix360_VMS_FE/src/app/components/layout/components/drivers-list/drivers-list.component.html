@@ -1,0 +1,158 @@
+<div class="space-y-5">
+  <div class="flex items-start justify-between gap-4">
+    <div>
+      <h1 class="text-2xl font-bold text-slate-900">Driver Management</h1>
+      <p class="text-sm text-slate-500 mt-1">Manage driver profiles</p>
+    </div>
+
+    <button (click)="openCreate()"
+      class="rounded-xl bg-slate-900 text-white px-4 py-2 font-semibold hover:bg-slate-800">
+      + Add Driver
+    </button>
+  </div>
+
+  <!-- Filters -->
+  <div class="bg-white border border-slate-200 rounded-2xl p-4">
+    <div class="flex flex-col md:flex-row gap-3 items-end">
+      <div class="flex-1">
+        <label class="text-xs text-slate-500">Search</label>
+        <input [(ngModel)]="q" (keyup.enter)="applyFilters()" placeholder="Name / licence / phone"
+          class="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 outline-none focus:ring-2 focus:ring-slate-300" />
+      </div>
+
+      <div class="flex gap-2">
+        <button (click)="applyFilters()"
+          class="rounded-xl bg-slate-900 text-white px-4 py-2 font-semibold hover:bg-slate-800">
+          Apply
+        </button>
+        <button (click)="clearFilters()"
+          class="rounded-xl border border-slate-200 px-4 py-2 font-semibold hover:bg-slate-50">
+          Clear
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden">
+    <div class="p-4 border-b border-slate-100 flex items-center justify-between">
+      <div class="text-sm text-slate-600">Drivers</div>
+      <div class="text-xs text-slate-500" *ngIf="meta">Total: {{ meta.total }}</div>
+    </div>
+
+    <div class="p-4" *ngIf="loading">Loading...</div>
+    <div class="p-4 text-red-600" *ngIf="error">{{ error }}</div>
+
+    <div class="overflow-x-auto" *ngIf="!loading">
+      <table class="w-full text-sm ml-12 ">
+        <thead>
+          <tr class="text-left text-slate-500">
+            <th class="py-2">Profile</th>
+            <th class="py-2">Name</th>
+            <th class="py-2">Licence</th>
+            <th class="py-2">Phone</th>
+            <th class="py-2">Address</th>
+            <th class="py-2">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let d of drivers" class="border-t border-slate-100">
+            <td class="py-2">
+              <div class="h-10 w-10 rounded-full bg-slate-100 overflow-hidden">
+                <img *ngIf="d.profile_image_url" [src]="d.profile_image_url" class="h-full w-full object-cover" />
+              </div>
+            </td>
+            <td class="py-2 font-medium text-slate-900">{{ d.name }}</td>
+            <td class="py-2 text-slate-600">{{ d.license_number }}</td>
+            <td class="py-2 text-slate-600">{{ d.phone }}</td>
+            <td class="py-2 text-slate-600">{{ d.address }}</td>
+            <td class="py-2">
+              <button (click)="openEdit(d)" class="px-3 py-1 rounded-lg border border-slate-200 hover:bg-slate-50">Edit</button>
+              <button (click)="confirmDelete(d)" class="ml-2 px-3 py-1 rounded-lg border border-red-200 text-red-700 hover:bg-red-50">Delete</button>
+            </td>
+          </tr>
+
+          <tr *ngIf="drivers.length === 0">
+            <td colspan="6" class="py-6 text-center text-slate-500">No drivers found.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="p-4 border-t border-slate-100 flex items-center justify-between" *ngIf="meta">
+      <div class="text-xs text-slate-500">
+        Page {{ meta.current_page }} of {{ meta.last_page }}
+      </div>
+      <div class="flex gap-2">
+        <button [disabled]="meta.current_page <= 1" (click)="loadDrivers(meta.current_page - 1)"
+          class="px-3 py-1 rounded-lg border border-slate-200 hover:bg-slate-50 disabled:opacity-50">
+          Prev
+        </button>
+        <button [disabled]="meta.current_page >= meta.last_page" (click)="loadDrivers(meta.current_page + 1)"
+          class="px-3 py-1 rounded-lg border border-slate-200 hover:bg-slate-50 disabled:opacity-50">
+          Next
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div *ngIf="modalOpen" class="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50">
+    <div class="w-full max-w-xl bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden">
+      <div class="p-4 border-b border-slate-100 flex items-center justify-between">
+        <div class="font-semibold text-slate-900">
+          {{ editing ? 'Edit Driver' : 'Add Driver' }}
+        </div>
+        <button (click)="closeModal()" class="h-9 w-9 rounded-xl hover:bg-slate-100">✕</button>
+      </div>
+
+      <div class="p-5 space-y-4">
+        <div *ngIf="error" class="text-sm text-red-600">{{ error }}</div>
+
+        <div>
+          <label class="text-xs text-slate-500">Name *</label>
+          <input [(ngModel)]="name" class="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2" />
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="text-xs text-slate-500">Licence Number *</label>
+            <input [(ngModel)]="license_number" class="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2" />
+          </div>
+          <div>
+            <label class="text-xs text-slate-500">Phone *</label>
+            <input [(ngModel)]="phone" class="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2" />
+          </div>
+        </div>
+
+        <div>
+          <label class="text-xs text-slate-500">Address *</label>
+          <input [(ngModel)]="address" class="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2" />
+        </div>
+
+        <div class="flex items-center gap-4">
+          <div class="h-16 w-16 rounded-full bg-slate-100 overflow-hidden border border-slate-200">
+            <img *ngIf="previewUrl" [src]="previewUrl" class="h-full w-full object-cover" />
+          </div>
+
+          <div class="flex-1">
+            <label class="text-xs text-slate-500">Profile Image (optional)</label>
+            <input type="file" (change)="onImageSelected($event)" accept="image/*"
+              class="mt-1 block w-full text-sm" />
+          </div>
+        </div>
+      </div>
+
+      <div class="p-4 border-t border-slate-100 flex justify-end gap-2">
+        <button (click)="closeModal()" class="px-4 py-2 rounded-xl border border-slate-200 hover:bg-slate-50">
+          Cancel
+        </button>
+        <button (click)="submit()" [disabled]="saving"
+          class="px-4 py-2 rounded-xl bg-slate-900 text-white font-semibold hover:bg-slate-800 disabled:opacity-60">
+          {{ saving ? 'Saving...' : 'Save' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
