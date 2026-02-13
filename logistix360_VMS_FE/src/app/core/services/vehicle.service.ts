@@ -20,7 +20,6 @@ export class VehicleService {
   }
 
   update(id: number, fd: FormData) {
-    // easiest way for multipart update
     fd.set('_method', 'PUT');
     return this.api.post<any>(`/vehicles/${id}`, fd);
   }

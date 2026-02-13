@@ -21,7 +21,6 @@ export class ProfileComponent implements OnInit {
 
   user: any = null;
 
-  // profile form
   first_name = '';
   last_name = '';
   username = '';
@@ -29,11 +28,9 @@ export class ProfileComponent implements OnInit {
 showCurrentPassword = false;
 showNewPassword = false;
 showConfirmNewPassword = false;
-  // image
   imageFile: File | null = null;
   previewUrl: string | null = null;
 
-  // password form
   current_password = '';
   password = '';
   password_confirmation = '';

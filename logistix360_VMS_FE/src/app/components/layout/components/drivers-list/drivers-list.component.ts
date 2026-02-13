@@ -20,12 +20,9 @@ export class DriversListComponent implements OnInit {
   page = 1;
 
   q = '';
-
-  // modal
   modalOpen = false;
   editing: any | null = null;
 
-  // form fields
   name = '';
   license_number = '';
   phone = '';

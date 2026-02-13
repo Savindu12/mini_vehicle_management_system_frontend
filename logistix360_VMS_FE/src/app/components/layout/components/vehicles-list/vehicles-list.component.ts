@@ -15,28 +15,22 @@ type Vehicle = any;
   styleUrl: './vehicles-list.component.css'
 })
 export class VehiclesListComponent implements OnInit {
-  // list state
   loading = false;
   error: string | null = null;
   vehicles: Vehicle[] = [];
-  meta: any = null; // Laravel paginator
+  meta: any = null;
   page = 1;
-
-  // filters
   q = '';
   status = '';
   vehicle_type = '';
 
-  // drivers dropdown data
   drivers: Driver[] = [];
   driversLoading = false;
 
-  // modal state
   modalOpen = false;
   saving = false;
   editing: Vehicle | null = null;
 
-  // form fields
   vehicle_name = '';
   registration_number = '';
   form_vehicle_type: 'Truck' | 'Van' | 'Mini-bus' | '' = '';
@@ -77,7 +71,6 @@ export class VehiclesListComponent implements OnInit {
     this.driversLoading = true;
     this.driversApi.list({ q: '', page: 1 }).subscribe({
       next: (res) => {
-        // take first page (10). If you want more, increase backend paginate or call multiple pages.
         this.drivers = res.data || [];
         this.driversLoading = false;
       },
@@ -134,7 +127,6 @@ export class VehiclesListComponent implements OnInit {
     if (!file) return;
     this.vehicle_image_file = file;
 
-    // preview
     const reader = new FileReader();
     reader.onload = () => (this.previewUrl = String(reader.result));
     reader.readAsDataURL(file);
@@ -156,9 +148,8 @@ export class VehiclesListComponent implements OnInit {
     fd.set('vehicle_type', this.form_vehicle_type);
     fd.set('status', this.form_status);
 
-    // driver assignment (nullable)
     if (this.driver_id) fd.set('driver_id', String(this.driver_id));
-    else fd.set('driver_id', ''); // Laravel treats empty as null if handled; your controller uses ?? null
+    else fd.set('driver_id', ''); 
 
     if (this.vehicle_image_file) fd.set('vehicle_image', this.vehicle_image_file);
 
@@ -189,7 +180,6 @@ export class VehiclesListComponent implements OnInit {
     });
   }
 
-  // simple badge classes
   statusClass(s: string) {
     if (s === 'Available') return 'bg-emerald-50 text-emerald-700 border-emerald-200';
     if (s === 'In Maintenance') return 'bg-amber-50 text-amber-700 border-amber-200';
