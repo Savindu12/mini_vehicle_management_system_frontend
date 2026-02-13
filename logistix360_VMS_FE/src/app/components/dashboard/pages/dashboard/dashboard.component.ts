@@ -18,7 +18,6 @@ export class DashboardComponent implements OnInit {
   recentVehicles: any[] = [];
   recentDrivers: any[] = [];
 
-  // PIE: Vehicle Status Distribution
   pieChartType: ChartType = 'pie';
   pieChartData: ChartData<'pie', number[], string | string[]> = {
     labels: ['Available', 'In Maintenance', 'On Route'],
@@ -31,7 +30,6 @@ export class DashboardComponent implements OnInit {
     },
   };
 
-  // BAR: Vehicles vs Drivers + Vehicle Status counts
   barChartType: ChartType = 'bar';
   barChartData: ChartData<'bar', number[], string | string[]> = {
     labels: ['Vehicles Total', 'Drivers Total', 'Available', 'Maintenance', 'On Route'],
@@ -57,7 +55,6 @@ export class DashboardComponent implements OnInit {
       next: (res) => {
         this.counts = res.counts;
 
-        // Update charts using API counts
         const available = Number(this.counts.vehicles_available ?? 0);
         const maintenance = Number(this.counts.vehicles_in_maintenance ?? 0);
         const onRoute = Number(this.counts.vehicles_on_route ?? 0);
